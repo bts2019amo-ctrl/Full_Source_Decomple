@@ -1,0 +1,21 @@
+# macOS / Xcode
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+
+# Local/server secrets and runtime data
+Admin_Client/database.config.php
+Admin_Client/request-stats.json
+Admin_Client/php-server*.log
+Admin_Client/uploads/*
+!Admin_Client/uploads/.gitkeep
+
+# Archives and generated artifacts
+Admin_Client/WEBSITE.zip
+*.ipa
+*.app
+*.dSYM
