@@ -1,0 +1,23 @@
+name: iOS build (unsigned)
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build target 3105 for iOS Simulator without signing
+        run: >-
+          xcodebuild
+          -project ThreeOneOSFive.xcodeproj
+          -target 3105
+          -sdk iphonesimulator
+          -configuration Debug
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          build
