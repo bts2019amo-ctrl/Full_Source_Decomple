@@ -11,25 +11,22 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Archive target 3105 for iPhoneOS without signing
+      - name: Build target 3105 for iPhoneOS without signing
         run: >-
           xcodebuild
           -project ThreeOneOSFive.xcodeproj
           -target 3105
           -sdk iphoneos
           -configuration Release
-          -archivePath "$GITHUB_WORKSPACE/build/APEXIPA.xcarchive"
-          -destination 'generic/platform=iOS'
+          CONFIGURATION_BUILD_DIR="$GITHUB_WORKSPACE/build/Payload"
           CODE_SIGNING_ALLOWED=NO
           CODE_SIGNING_REQUIRED=NO
-          archive
+          build
       - name: Package unsigned IPA
         run: |
           set -euo pipefail
-          APP_PATH="$(find build/APEXIPA.xcarchive/Products/Applications -maxdepth 1 -name '*.app' -print -quit)"
+          APP_PATH="$(find build/Payload -maxdepth 1 -name '*.app' -print -quit)"
           test -n "$APP_PATH"
-          mkdir -p build/Payload
-          cp -R "$APP_PATH" build/Payload/
           (cd build && zip -qry APEXIPA-unsigned.ipa Payload)
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
