@@ -1,23 +1,39 @@
-name: iOS build (unsigned)
+name: iOS build and IPA (unsigned)
 
 on:
   push:
     branches: ["**"]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build target 3105 for iOS Simulator without signing
+      - name: Archive target 3105 for iPhoneOS without signing
         run: >-
           xcodebuild
           -project ThreeOneOSFive.xcodeproj
           -target 3105
-          -sdk iphonesimulator
-          -configuration Debug
-          -destination 'generic/platform=iOS Simulator'
+          -sdk iphoneos
+          -configuration Release
+          -archivePath "$GITHUB_WORKSPACE/build/APEXIPA.xcarchive"
+          -destination 'generic/platform=iOS'
           CODE_SIGNING_ALLOWED=NO
           CODE_SIGNING_REQUIRED=NO
-          build
+          archive
+      - name: Package unsigned IPA
+        run: |
+          set -euo pipefail
+          APP_PATH="$(find build/APEXIPA.xcarchive/Products/Applications -maxdepth 1 -name '*.app' -print -quit)"
+          test -n "$APP_PATH"
+          mkdir -p build/Payload
+          cp -R "$APP_PATH" build/Payload/
+          (cd build && zip -qry APEXIPA-unsigned.ipa Payload)
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: APEXIPA-unsigned
+          path: build/APEXIPA-unsigned.ipa
+          if-no-files-found: error
